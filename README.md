@@ -6,3 +6,22 @@ This project as the title said is a simple rest api built with gin a go based fr
 ## Functionnalities
 - Get all ablums stored in memory
 - Save a new album
+
+
+## Testing
+- Get all albums
+```shell
+$ curl http://localhost:8080/albums \
+    --header \
+    "Content-Type: application/json" \
+    --request "GET"
+```
+
+- Post a new album
+```shell
+$ curl http://localhost:8080/albums \
+    --include --header \
+    "Content-Type: application/json" \
+    --request "POST" --data \
+    '{"id": "4","title": "The Modern Sound of Betty Carter","artist": "Betty Carter","price": 49.99}'
+``` 
