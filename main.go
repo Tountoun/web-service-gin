@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +27,7 @@ func main() {
 	router.GET("/albums/:id", getAlbumByID)
 	router.DELETE("/albums/:id", deleteAlbumByID)
 	router.POST("/albums/list", postAlbums)
+	router.GET("/albums/search", searchAlbum)
 
 	router.Run("localhost:8080")
 }
@@ -85,4 +87,17 @@ func postAlbums(c *gin.Context) {
 	}
 	albums = append(albums, newAlbums...)
 	c.IndentedJSON(http.StatusOK, albums)
+}
+
+// search for an album using a keyword
+func searchAlbum(c *gin.Context) {
+	key := c.Query("key")
+	result := make([]album, 0)
+
+	for _, album := range albums {
+		if strings.Contains(album.Title, key) || strings.Contains(album.Artist, key) {
+			result = append(result, album)
+		}
+	}
+	c.IndentedJSON(http.StatusOK, result)
 }

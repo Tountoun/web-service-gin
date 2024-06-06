@@ -9,7 +9,7 @@ This project as the title said is a simple rest api built with gin a go based fr
 - Get one album by its ID
 - Delete one album by its ID
 - Save a list of albums
-
+- Seach an album using a keyword
 
 ## Testing
 - Get all albums
@@ -45,4 +45,9 @@ $ curl http://localhost:8080/albums/list \
     --request "POST" \
     --header "Content-Type:application/json" \
     --data '[{"id": "4","title": "The Modern Sound of Betty Carter","artist": "Betty Carter","price": 49.99},{"id": "5","title": "The secrets of Holly","artist": "Mikey Holly","price": 32.2}, {"id": "6","title": "Hart of Me","artist": "Sam Lion","price": 50}]'
+```
+
+- Search an album using key `holly`
+```shell
+$ curl http://localhost:8080/albums/search?key=holly
 ```
