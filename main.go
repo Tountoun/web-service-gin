@@ -25,6 +25,7 @@ func main() {
 	router.POST("/albums", postAlbum)
 	router.GET("/albums/:id", getAlbumByID)
 	router.DELETE("/albums/:id", deleteAlbumByID)
+	router.POST("/albums/list", postAlbums)
 
 	router.Run("localhost:8080")
 }
@@ -73,4 +74,15 @@ func deleteAlbumByID(c *gin.Context) {
 		}
 	}
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album with id " + id + " not found"})
+}
+
+// save many albums
+func postAlbums(c *gin.Context) {
+	var newAlbums []album 
+	if err := c.BindJSON(&newAlbums); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	albums = append(albums, newAlbums...)
+	c.IndentedJSON(http.StatusOK, albums)
 }
