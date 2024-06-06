@@ -2,16 +2,17 @@ package main
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
+	ID     string  `json:"id" binding:"required"`
+	Title  string  `json:"title" binding:"required"`
+	Artist string  `json:"artist" bindiing:"required"`
+	Price  float64 `json:"price" binding:"required"`
 }
 
 var albums = []album{
@@ -28,6 +29,7 @@ func main() {
 	router.DELETE("/albums/:id", deleteAlbumByID)
 	router.POST("/albums/list", postAlbums)
 	router.GET("/albums/search", searchAlbum)
+	router.PUT("/albums/:id", updateAlbum)
 
 	router.Run("localhost:8080")
 }
@@ -100,4 +102,24 @@ func searchAlbum(c *gin.Context) {
 		}
 	}
 	c.IndentedJSON(http.StatusOK, result)
+}
+
+// update an album
+func updateAlbum(c *gin.Context) {
+	id := c.Param("id")
+	var updateData album
+
+	if err := c.BindJSON(&updateData); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	if id != updateData.ID {
+		c.IndentedJSON(http.StatusOK, gin.H{"message": "Can not update the id of the album"})
+		return
+	}
+	index := slices.IndexFunc(albums, func(al album) bool {
+		return al.ID == id
+	})
+	albums := slices.Replace(albums, index, index + 1, updateData)
+	c.IndentedJSON(http.StatusOK, albums[index])
 }
