@@ -7,6 +7,7 @@ This project as the title said is a simple rest api built with gin a go based fr
 - Get all ablums stored in memory
 - Save a new album
 - Get one album by its ID
+- Delete one album by its ID
 
 
 ## Testing
@@ -27,7 +28,12 @@ $ curl http://localhost:8080/albums \
     '{"id": "4","title": "The Modern Sound of Betty Carter","artist": "Betty Carter","price": 49.99}'
 ``` 
 
-- Get one album by id
+- Get album with id 2
 ```shell
 $ curl http://localhost:8080/albums/2
+```
+
+- Delete album with id 2
+```shell
+$ curl http://localhost:8080/albums/2 --request "DELETE"
 ```
