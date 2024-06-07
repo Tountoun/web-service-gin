@@ -1,3 +1,6 @@
 2024/06/07 15:34:40 Getting all albums
 2024/06/07 15:34:52 Getting album with id 3
 2024/06/07 15:34:54 Album with id 5 not found
+INFO:	2024/06/07 17:04:11 main.go:78: Getting album with id 3
+ERROR:	2024/06/07 17:04:17 main.go:83: Album with id 5 not found
+INFO:	2024/06/07 17:04:24 main.go:51: Getting all albums

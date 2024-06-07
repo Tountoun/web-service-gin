@@ -1,11 +1,12 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
-	"os"
 	"slices"
 	"strings"
+
+	u "example.com/web-service-gin/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,14 +24,17 @@ var albums = []album{
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
+var info = func(s string) {
+	u.Info.Output(2, s)
+}
+
+var error = func(s string) {
+	u.Error.Output(2, s)
+}
+
 func main() {
-	file, err := os.OpenFile("logging.txt", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.SetOutput(file)
-	
 	router := gin.Default()
+
 	router.GET("/albums", getAlbums)
 	router.POST("/albums", postAlbum)
 	router.GET("/albums/:id", getAlbumByID)
@@ -44,7 +48,7 @@ func main() {
 
 // get all albums
 func getAlbums(c *gin.Context) {
-	log.Println("Getting all albums")
+	info(fmt.Sprintln("Getting all albums"))
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
@@ -54,12 +58,12 @@ func postAlbum(c *gin.Context) {
 
 	// bind the request body data to newAlbum
 	if err := c.BindJSON(&newAlbum); err != nil {
-		log.Println("Bad request when intending to post a new album")
+		error(fmt.Sprintln("Bad request when intending to post a new album"))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	log.Println("Posting album", newAlbum)
+	info(fmt.Sprintln("Posting album", newAlbum))
 	// add the new album to the slice
 	albums = append(albums, newAlbum)
 	c.IndentedJSON(http.StatusCreated, newAlbum)
@@ -71,12 +75,12 @@ func getAlbumByID(c *gin.Context) {
 
 	for _, album := range albums {
 		if album.ID == id {
-			log.Println("Getting album with id", id)
+			info(fmt.Sprintln("Getting album with id", id))
 			c.IndentedJSON(http.StatusOK, album)
 			return
 		}
 	}
-	log.Printf("Album with id %v not found\n", id)
+	error(fmt.Sprintf("Album with id %v not found\n", id))
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album with id " + id + " not found"})
 }
 
@@ -86,13 +90,13 @@ func deleteAlbumByID(c *gin.Context) {
 
 	for idx, album := range albums {
 		if album.ID == id {
-			log.Println("Deleting album with id", id)
+			info(fmt.Sprintln("Deleting album with id", id))
 			albums = append(albums[:idx], albums[idx+1:]... )
 			c.IndentedJSON(http.StatusOK, gin.H{"message": "Album with id " + id + " deleted successfully"})
 			return
 		}
 	}
-	log.Printf("Album with id %v not found\n", id)
+	error(fmt.Sprintf("Album with id %v not found\n", id))
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album with id " + id + " not found"})
 }
 
@@ -100,11 +104,11 @@ func deleteAlbumByID(c *gin.Context) {
 func postAlbums(c *gin.Context) {
 	var newAlbums []album 
 	if err := c.BindJSON(&newAlbums); err != nil {
-		log.Println("Bad request when intending to post a list of albums")
+		error(fmt.Sprintln("Bad request when intending to post a list of albums"))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	log.Println("Posting albums", albums)
+	info(fmt.Sprintln("Posting albums", albums))
 	albums = append(albums, newAlbums...)
 	c.IndentedJSON(http.StatusOK, albums)
 }
@@ -114,7 +118,7 @@ func searchAlbum(c *gin.Context) {
 	key := c.Query("key")
 	result := make([]album, 0)
 
-	log.Println("Searching an album with keyword", key)
+	info(fmt.Sprintln("Searching an album with keyword", key))
 	for _, album := range albums {
 		if strings.Contains(album.Title, key) || strings.Contains(album.Artist, key) {
 			result = append(result, album)
@@ -129,12 +133,12 @@ func updateAlbum(c *gin.Context) {
 	var updateData album
 
 	if err := c.BindJSON(&updateData); err != nil {
-		log.Println("Bad request when intending to update album with id", id)
+		error(fmt.Sprintln("Bad request when intending to update album with id", id))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	if id != updateData.ID {
-		log.Printf("Can not update album with id %v. Path parameter must be equal to the updated data id\n", id)
+		error(fmt.Sprintf("Can not update album with id %v. Path parameter must be equal to the updated data id\n", id))
 		c.IndentedJSON(http.StatusOK, gin.H{"message": "Can not update the id of the album"})
 		return
 	}
@@ -142,6 +146,6 @@ func updateAlbum(c *gin.Context) {
 		return al.ID == id
 	})
 	albums := slices.Replace(albums, index, index + 1, updateData)
-	log.Println("Updating album with id", id)
+	info(fmt.Sprintln("Updating album with id", id))
 	c.IndentedJSON(http.StatusOK, albums[index])
 }
