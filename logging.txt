@@ -1,0 +1,3 @@
+2024/06/07 15:34:40 Getting all albums
+2024/06/07 15:34:52 Getting album with id 3
+2024/06/07 15:34:54 Album with id 5 not found

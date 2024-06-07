@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"slices"
 	"strings"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +24,12 @@ var albums = []album{
 }
 
 func main() {
+	file, err := os.OpenFile("logging.txt", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.SetOutput(file)
+	
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.POST("/albums", postAlbum)
